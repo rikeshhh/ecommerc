@@ -1,3 +1,5 @@
+/** @format */
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import About from "./About";
@@ -11,7 +13,8 @@ import { GlobalStyle } from "./GlobalStyle";
 import { ThemeProvider } from "styled-components";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-
+import AdminDashboard from "./AdminDashboard";
+import { useAuth0 } from "@auth0/auth0-react";
 const App = () => {
   const theme = {
     colors: {
@@ -37,6 +40,7 @@ const App = () => {
       tab: "998px",
     },
   };
+  const { user, isAuthenticated } = useAuth0();
 
   return (
     <ThemeProvider theme={theme}>
@@ -44,13 +48,23 @@ const App = () => {
         <GlobalStyle />
         <Header />
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/singleproduct/:id" element={<SingleProduct />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="*" element={<ErrorPage />} />
+          {isAuthenticated && user?.email === "admin@example.com" ? (
+            <>
+              <Route path="/" element={<AdminDashboard />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+            </>
+          ) : (
+            <>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/singleproduct/:id" element={<SingleProduct />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="*" element={<ErrorPage />} />
+            </>
+          )}
         </Routes>
         <Footer />
       </Router>
